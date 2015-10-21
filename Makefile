@@ -4,12 +4,12 @@ all: public private
 prep:
 	rm -rf $GOPATH/pkg
 	mkdir -p bin
-	go get ./...
+	#go get ./...
 
-agent: prep
+public: prep
 	go build -o=./bin/public public/main.go
 
-boss: prep
+private: prep
 	go build -o=./bin/private private/main.go
 
 test: all
@@ -17,7 +17,7 @@ test: all
 	bin/public &
 	bin/private &
 	sleep 1
-	curl -XPOST -d"TEST" -H"Accept:application/json" http://localhost:9099/this/is/a/test
+	curl -XPOST -d"TEST" -H"Accept:application/json" http://localhost:9099/
 	sleep 2
 	killall private
 	killall public

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/xeb/backq/src/modules/public"
+	"github.com/xeb/backq/modules/public"
 )
 
 const reqaddy string = "tcp://*:20000"
@@ -16,5 +16,5 @@ func main() {
 	fmt.Printf("[PUBLIC] Binding HTTP receiver to ':%d'\n", httpport)
 
 	public.BindBackQ(reqaddy, repaddy)
-	public.BindHttp(httpport)
+	public.BindHTTP(httpport)
 }
