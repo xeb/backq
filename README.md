@@ -1,13 +1,39 @@
-[![Build Status](https://travis-ci.org/xeb/gload.svg?branch=master)](https://travis-ci.org/xeb/gload)
+[![Build Status](https://travis-ci.org/xeb/backq.svg?branch=master)](https://travis-ci.org/xeb/backq)
 
-WORK IN PROGRESS
+WORK IN PROGRESS; not all working yet
 
-# gload
-Golang-based Load Testing.  
+# backq
+A reverse proxy utilizing Zero-MQ to access HTTP resources behind a firewall.
 
-# Three Binaries
-* ***Boss*** The REPL client for sending commands to remote agents via the coordinator
-* ***Proxy*** The proxy that should be publically accessible to all agents and the boss.  Responsible for "cluster" management and proxy'ing commands.
-* ***Agent***  The remote process that connects to the proxy, receives commands, executes them & returns results.  All stdin, stdout, stderr.
+# Build
+Simply run:
+```
+make all
+```
+Or to run some basic tests run:
+```
+make test
+```
 
-_
+# How To
+## Step 1, Public Server
+From a publicly accessible server, run the "public" binary
+```
+./bin/public
+```
+Ensure that ports 20,000 and 30,000 are open (the current defaults)
+
+## Step 2, Private proxy
+From a privately accessible server, run the "private" binary
+```
+./bin/private
+```
+This will connect to the public server on both ports 20,000 and 30,000.  It will listen for requests on 20,000, execute an HTTP request, and send the results back (JSON payload) over port 30,000.
+
+## Step 3, Try it out
+Do something like:
+```
+curl -L -k http://public-server:9099/something
+```
+
+You should get the results of the private server making the request.
