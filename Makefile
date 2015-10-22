@@ -4,7 +4,7 @@ all: public private
 prep:
 	rm -rf $GOPATH/pkg
 	mkdir -p bin
-	#go get ./...
+	go get ./...
 
 public: prep
 	go build -o=./bin/public public/main.go
