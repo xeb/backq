@@ -1,7 +1,5 @@
 [![Build Status](https://travis-ci.org/xeb/backq.svg?branch=master)](https://travis-ci.org/xeb/backq)
 
-WORK IN PROGRESS; not all working yet
-
 # backq
 A reverse proxy utilizing Zero-MQ to access HTTP resources behind a firewall.
 
