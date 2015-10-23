@@ -11,6 +11,9 @@ type Request struct {
 	Headers http.Header
 	Body    string
 	Method  string
+
+	// The original value from http.Request.Host
+	Host string
 }
 
 // Reply Message representing an HTTP Reply

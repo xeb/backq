@@ -38,13 +38,17 @@ func sendRequest(r *messages.Request) (rep *messages.Reply) {
 	rc := make(chan string, 1)
 	go func() {
 		reply, _ = repsock.Recv(0)
+		fmt.Printf("[PUBLIC] received %d bytes \n", len(reply))
 		rc <- reply
 	}()
 
 	select {
 	case reply = <-rc:
-		fmt.Printf("[PUBLIC] received %d bytes \n", len(reply))
-		rep.StatusCode = 200
+		rep, e = messages.NewReply(reply)
+		if e != nil {
+			rep.StatusCode = 500
+			rep.Body = e.Error()
+		}
 	case <-time.After(time.Second * 10):
 		fmt.Printf("[PUBLIC] TIMEOUT waiting for reply\n")
 		rep.StatusCode = 500
@@ -66,6 +70,8 @@ func BindHTTP(port int) {
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
 
+	fmt.Printf("[PUBLIC] Request Host is %s\n", r.Host)
+
 	bodybytes, _ := ioutil.ReadAll(r.Body)
 	body := string(bodybytes)
 	req := &messages.Request{
@@ -73,17 +79,18 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		Headers: r.Header,
 		Body:    body,
 		Method:  r.Method,
+		Host:    r.Host,
 	}
 
 	rep := sendRequest(req)
-	fmt.Printf("[PUBLIC] Writing response %s\n", rep)
-
 	w.WriteHeader(rep.StatusCode)
-	for k, _ := range rep.Headers {
+	fmt.Printf("[PUBLIC] Wrote status code %d\n", rep.StatusCode)
+
+	for k := range rep.Headers {
 		w.Header().Set(k, rep.Headers[k][0])
-		fmt.Printf("[PUBLIC] Writing header %s==%s", k, rep.Headers[k][0])
+		fmt.Printf("[PUBLIC] Writing header %s==%s\n", k, rep.Headers[k][0])
 	}
 
 	fmt.Fprintf(w, rep.Body)
-	fmt.Printf("[PUBLIC] DONE, request handled %s\n", rep)
+	fmt.Printf("[PUBLIC] DONE, request handled %s\n", req)
 }

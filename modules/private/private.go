@@ -59,7 +59,7 @@ func SendReply(r *http.Response, body string, repsock *zmq.Socket) {
 // MakeRequest will actually go out and make a private HTTP request
 func MakeRequest(req *messages.Request) (r *http.Response, body string, e error) {
 	client := &http.Client{}
-	urlv, _ := url.Parse(fmt.Sprintf("http://www.google.com%s", req.URL))
+	urlv, _ := url.Parse(fmt.Sprintf("http://%s%s", req.Host, req.URL))
 	request := &http.Request{
 		Method: req.Method,
 		URL:    urlv,
