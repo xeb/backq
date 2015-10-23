@@ -18,24 +18,44 @@ You will need Golang
 
 
 # How To
-## Step 1, Public Server
-On a publicly accessible server, run the "public" binary
+## Build the Binaries
+To just build everything, run:
 ```
-./bin/public
+make all
 ```
-Ensure that ports 20,000 and 30,000 are open (the current defaults for 0mq traffic) and port 9099 (the current default for HTTP proxying)
+from the above step
 
-## Step 2, Private proxy
-From a privately accessible server (e.g. inside a network), run the "private" binary
+## Step 2, Run a Public Server
+On a publicly accessible server, run the "bqpublic" binary specifying the port for the 0mq publish socket, the 0mq reply socket and the HTTP report to listen for requests on.  As in:
 ```
-./bin/private
+./bin/bqpublic --request_port=20000 --reply_port=30000 --http_port=9099
 ```
-This will connect to the public server on both ports 20,000 and 30,000.  It will subscribe to requests on 20,000, execute an HTTP request, and send the results back (JSON payload) over port 30,000 to the public server.
+The public server will open 3 sockets to facilitate these connections.  Make sure they are all accessible.
 
-## Step 3, Try it out
-Do something like:
+## Step 3, Run a Private Proxy
+From a privately accessible server (e.g. inside a network), run the "bqprivate" binary specifying the port for the 0mq subscribe socket, the 0mq request socket and the public host to connect to (can be hostname or IP address).  As in:
 ```
-curl -L -k http://public-server:9099/something
+./bin/bqprivate --request_port=20000 --reply_port=30000 --public_host=public-server 
 ```
+You'll want this binary to run from the place that you want all of your HTTP requests to originate from.
 
-You should get the results as-if the *private server* made the request.  I'm working on a model for either passing host headers or doing virtual directories (e.g. http://public-server:9099/internal-server/path/to/api which the private server would execute as http://internal-server/path/to/api)
+## Step 4, cURL it Out!
+With bqpublic and bqprivate running, do something like:
+```
+curl -vvv -H 'Host: google.com' http://public-server:9099/webhp?q=golang
+```
+You should get the results as-if the *private server* made the request.  Note that the host header will be passed along and bqprivate will reply back (on port 30000 in our example) the JSON payload of a request to "http://google.com/webhp?q=golang".
+
+
+# What is this good for?
+Querying APIs or websites that are behind a firewall but which you can access remotely.  Example:
+
+* Your router's web API interface at home is on: 192.168.1.1
+* You have a host entry in your home computer for "router" to resolve to 192.168.1.1
+* You run **bqpublic** on an AWS instance with a hostname of "aws-server"
+* You run **bqprivate** on your home computer
+* You update your work computer to have a host entry of "router" that resolves to the IP of "aws-server"
+* You browse to http://aws-server/ from work but will get the results of http://router as if your computer at home made the request!
+
+... all to avoid actually opening any ports or changing any connection initialization rules.
+
