@@ -1,7 +1,12 @@
 [![Build Status](https://travis-ci.org/xeb/backq.svg?branch=master)](https://travis-ci.org/xeb/backq)
-
 # backq
-A reverse proxy utilizing Zero-MQ to access HTTP resources behind a firewall.
+A reverse proxy utilizing 0MQ to access HTTP resources behind a firewall.
+
+# TODO:
+* SSL support
+* Correlation of responses
+* More tests
+* Better logging
 
 # Build
 Simply run:
@@ -14,9 +19,11 @@ make test
 ```
 You will need Golang
 
+# Overview
+<img src="https://raw.githubusercontent.com/xeb/backq/master/backq-overview.png" />
 
 # How To
-## Build the Binaries
+## Step 1, Build the Binaries
 To just build everything, run:
 ```
 make all
@@ -46,7 +53,7 @@ You should get the results as-if the *private server* made the request.  Note th
 
 
 # What is this good for?
-Querying APIs or websites that are behind a firewall but which you can access remotely.  Example:
+Querying APIs or websites that are behind a firewall but which you want to access remotely.  Example:
 
 * Your router's web API interface at home is on: 192.168.1.1
 * You have a host entry in your home computer for "router" to resolve to 192.168.1.1
@@ -56,4 +63,6 @@ Querying APIs or websites that are behind a firewall but which you can access re
 * You browse to http://aws-server/ from work but will get the results of http://router as if your computer at home made the request!
 
 ... all to avoid actually opening any ports or changing any connection initialization rules.
+
+A little silly, admittedly.
 
