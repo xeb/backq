@@ -58,11 +58,17 @@ func sendRequest(r *messages.Request) (rep *messages.Reply) {
 }
 
 // BindHTTP will bind the listener HTTP interface for accepting backq'd requests
-func BindHTTP(port int) {
+func BindHTTP(port int, cert string, key string) {
 	http.HandleFunc("/", handleRequest)
 	address := fmt.Sprintf(":%d", port)
 	println("[PUBLIC] Listening on ", address)
-	err := http.ListenAndServe(address, nil)
+
+	var err error
+	if cert == "" && key == "" {
+		err = http.ListenAndServe(address, nil)
+	} else {
+		err = http.ListenAndServeTLS(address, cert, key, nil)
+	}
 	if err != nil {
 		fmt.Printf("ListenAndServe ERR %s\n", err)
 	}

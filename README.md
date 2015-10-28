@@ -1,9 +1,7 @@
-[![Build Status](https://travis-ci.org/xeb/backq.svg?branch=master)](https://travis-ci.org/xeb/backq)
-# backq
+# backq [![Build Status](https://travis-ci.org/xeb/backq.svg?branch=master)](https://travis-ci.org/xeb/backq)
 A reverse proxy utilizing 0MQ to access HTTP resources behind a firewall.
 
 # TODO:
-* SSL support
 * Correlation of responses
 * More tests
 * Better logging
@@ -23,6 +21,35 @@ You will need Golang
 <img src="https://raw.githubusercontent.com/xeb/backq/master/backq-overview.png" />
 
 # How To
+
+## Arguments for bqpublic
+```
+$ bin/bqpublic --help
+usage: bqpublic --request_port=REQUEST_PORT --reply_port=REPLY_PORT --http_port=HTTP_PORT [<flags>]
+
+Flags:
+  --help                       Show context-sensitive help (also try --help-long and --help-man).
+  --request_port=REQUEST_PORT  The 0MQ port for publishing requests to bqprivate, e.g. a value of 20000 means binding to 'tcp://*:20000'
+  --reply_port=REPLY_PORT      The 0MQ port for listening for replies from bqprivate
+  --http_port=HTTP_PORT        The HTTP Port to listen on
+  --certpath=CERTPATH          If set, this will Enable SSL and set the Cert Path
+  --keypath=KEYPATH            If set, this will Enable SSL and set the Key Path
+  --gen_ssl                    If set, this will automatically create cert.pem and key.pem and enable SSL
+```
+
+## Arguments for bqprivate
+```
+$ bin/bqprivate --help
+usage: bqprivate --request_port=REQUEST_PORT --reply_port=REPLY_PORT --public_host=PUBLIC_HOST [<flags>]
+
+Flags:
+  --help                       Show context-sensitive help (also try --help-long and --help-man).
+  --request_port=REQUEST_PORT  The 0MQ port for publishing requests to bqprivate, e.g. a value of 20000 means binding to 'tcp://*:20000'
+  --reply_port=REPLY_PORT      The 0MQ port for listening for replies from bqprivate
+  --public_host=PUBLIC_HOST    The host name or IP address of the bqpublic server
+
+```
+
 ## Step 1, Build the Binaries
 To just build everything, run:
 ```
@@ -33,9 +60,9 @@ from the above step
 ## Step 2, Run a Public Server
 On a publicly accessible server, run the "bqpublic" binary specifying the port for the 0mq publish socket, the 0mq reply socket and the HTTP report to listen for requests on.  As in:
 ```
-./bin/bqpublic --request_port=20000 --reply_port=30000 --http_port=9099
+./bin/bqpublic --request_port=20000 --reply_port=30000 --http_port=9099 --gen_ssl
 ```
-The public server will open 3 sockets to facilitate these connections.  Make sure they are all accessible.
+The public server will open 3 sockets to facilitate these connections.  Make sure they are all accessible.  If you specify ```--gen_ssl``` the program will generate a self signed cert.pem and key.pem in the current path.  These can also be specified
 
 ## Step 3, Run a Private Proxy
 From a privately accessible server (e.g. inside a network), run the "bqprivate" binary specifying the port for the 0mq subscribe socket, the 0mq request socket and the public host to connect to (can be hostname or IP address).  As in:
