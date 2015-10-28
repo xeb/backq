@@ -67,6 +67,7 @@ func BindHTTP(port int, cert string, key string) {
 	if cert == "" && key == "" {
 		err = http.ListenAndServe(address, nil)
 	} else {
+		fmt.Printf("[PUBLIC] Binding TLS using cert %s and key %s...\n", cert, key)
 		err = http.ListenAndServeTLS(address, cert, key, nil)
 	}
 	if err != nil {

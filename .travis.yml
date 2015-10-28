@@ -13,6 +13,7 @@ before_install:
  - sudo make install
  - sudo /sbin/ldconfig
  - cd ..
+ - CURLOPT_SSL_VERIFYHOST=0
 
 script:
   - make test

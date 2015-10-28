@@ -9,7 +9,7 @@ A reverse proxy utilizing 0MQ to access HTTP resources behind a firewall.
 # Build
 Simply run:
 ```
-make all
+make
 ```
 Or to run some basic tests run:
 ```
